@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/feel-easy/hole-server/global"
+	"go.uber.org/zap"
 )
 
 type User struct {
@@ -27,8 +28,7 @@ func (u *User) ListenMessage() {
 		if strings.HasPrefix(mes, u.Name) {
 			continue
 		}
-		// 传入mes，并将其转换为字节数组
-		global.LOG.Sugar().Infof("%v\n", mes)
+		global.LOG.Info("消息", zap.String("msg", mes))
 		u.conn.Write([]byte(mes + "\n"))
 	}
 }

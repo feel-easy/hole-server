@@ -5,6 +5,7 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"github.com/feel-easy/hole-server/global"
 	"github.com/feel-easy/hole-server/server"
 	"github.com/spf13/cobra"
 )
@@ -15,7 +16,7 @@ var runCmd = &cobra.Command{
 	Short: "启动服务",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		s := server.NewServer("127.0.0.1", "8888")
+		s := server.NewServer(global.CONFIG.System.Host, global.CONFIG.System.Port)
 		s.Start()
 	},
 }

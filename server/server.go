@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/feel-easy/hole-server/global"
+	"go.uber.org/zap"
 )
 
 // 用户接受信息的缓冲区长度
@@ -74,7 +75,7 @@ func (s *Server) Handler(conn net.Conn) {
 				return
 			}
 			if err != nil && err != io.EOF {
-				fmt.Println("conn 读入出错")
+				global.LOG.Error("conn 读入出错")
 				return
 			}
 			// 以上条件均不满足，则正常读入，同时去除在末尾的可能的回车符
@@ -107,9 +108,9 @@ func (s *Server) Handler(conn net.Conn) {
 
 // 开启Server，轮询监听
 func (s *Server) Start() {
-	// Listen方法有两个参数，第一个参数为协议，第二个参数为ip+port
-	Listener, err := net.Listen("tcp", s.IP+":"+s.port)
-	global.LOG.Sugar().Infof("服务启动 tcp %s:%s ", s.IP, s.port)
+	path := fmt.Sprintf("%s:%s", s.IP, s.port)
+	Listener, err := net.Listen("tcp", path)
+	global.LOG.Info("服务启动", zap.String("tcp", path))
 	// 如果没有正常获取Listener
 	if err != nil {
 		global.LOG.Error("Listener has err!")
@@ -125,7 +126,7 @@ func (s *Server) Start() {
 	for {
 		conn, err := Listener.Accept()
 		if err != nil {
-			fmt.Println("conn has err")
+			global.LOG.Error("conn has err")
 			continue
 		}
 		go s.Handler(conn)
