@@ -50,7 +50,7 @@ func (s *Server) ListenMessage() {
 // 广播当前消息的方法
 func (s *Server) BroadCast(user *User, msg string) {
 	// 对OnlineMap进行消息广播
-	sendMsg := "[" + user.Addr + "]" + user.Name + ":" + msg
+	sendMsg := fmt.Sprintf("%s：->%s", user.Name, msg)
 	s.Message <- sendMsg
 }
 
@@ -58,9 +58,6 @@ func (s *Server) BroadCast(user *User, msg string) {
 func (s *Server) Handler(conn net.Conn) {
 	// 对于一个新加入的连接，创建一个新的User
 	user := GetUser(conn, s)
-	// 通知其上线
-	user.Online()
-
 	// 定义一个作为flag的channel，每当有消息写入时，向channel传入值
 	isAlive := make(chan int)
 	// 接收用户的信息，新开一个go程
@@ -89,7 +86,7 @@ func (s *Server) Handler(conn net.Conn) {
 		select {
 		case <-isAlive:
 			// 这里什么都不用写，根据select的语法，isAlive读入时，所有channel都会被执行/刷新
-		case <-time.After(time.Second * 100):
+		case <-time.After(time.Minute * 30):
 			{
 				// 将用户下线，并从服务器端释放资源
 				user.SendMsgSimple("您已下线")
