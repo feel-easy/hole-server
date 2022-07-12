@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/feel-easy/hole-server/global"
+	"github.com/feel-easy/hole-server/models"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -22,7 +23,9 @@ func Gorm() *gorm.DB {
 // RegisterTables 注册数据库表专用
 // Author SliverHorn
 func RegisterTables(db *gorm.DB) {
-	err := db.AutoMigrate()
+	err := db.AutoMigrate(
+		models.UserInfo{},
+	)
 	if err != nil {
 		global.LOG.Error("register table failed", zap.Error(err))
 		os.Exit(0)

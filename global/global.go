@@ -7,7 +7,6 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-	"golang.org/x/sync/singleflight"
 	"gorm.io/gorm"
 )
 
@@ -18,8 +17,5 @@ var (
 	CONFIG config.Server
 	VIPER  *viper.Viper
 	LOG    *zap.Logger
-
-	Concurrency_Control = &singleflight.Group{}
-
-	lock sync.RWMutex
+	lock   sync.RWMutex
 )

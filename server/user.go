@@ -1,9 +1,10 @@
 package server
 
 import (
-	"fmt"
 	"net"
 	"strings"
+
+	"github.com/feel-easy/hole-server/global"
 )
 
 type User struct {
@@ -27,7 +28,7 @@ func (u *User) ListenMessage() {
 			continue
 		}
 		// 传入mes，并将其转换为字节数组
-		fmt.Printf("%v\n", mes)
+		global.LOG.Sugar().Infof("%v\n", mes)
 		u.conn.Write([]byte(mes + "\n"))
 	}
 }
@@ -37,7 +38,6 @@ func (u *User) Online() {
 	u.server.mapLock.Lock()
 	u.server.OnlineMap[u.Name] = u
 	u.server.mapLock.Unlock()
-	// fmt.Printf("%v", u.server.OnlineMap)
 	u.server.BroadCast(u, "上线")
 }
 
@@ -73,10 +73,8 @@ func (u *User) rename(newName string) {
 		return
 	} else {
 		u.server.mapLock.Lock()
-		// fmt.Printf("%v", u.server.OnlineMap)
 		delete(u.server.OnlineMap, u.Name)
 		u.server.OnlineMap[newName] = u
-		// fmt.Printf("%v", u.server.OnlineMap)
 		u.server.mapLock.Unlock()
 		u.SendMsgSimple("更新用户名成功")
 		u.Name = newName

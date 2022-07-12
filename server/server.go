@@ -7,6 +7,8 @@ import (
 	"net"
 	"sync"
 	"time"
+
+	"github.com/feel-easy/hole-server/global"
 )
 
 // 用户接受信息的缓冲区长度
@@ -107,10 +109,10 @@ func (s *Server) Handler(conn net.Conn) {
 func (s *Server) Start() {
 	// Listen方法有两个参数，第一个参数为协议，第二个参数为ip+port
 	Listener, err := net.Listen("tcp", s.IP+":"+s.port)
-	fmt.Printf("服务启动 tcp %s:%s ", s.IP, s.port)
+	global.LOG.Sugar().Infof("服务启动 tcp %s:%s ", s.IP, s.port)
 	// 如果没有正常获取Listener
 	if err != nil {
-		fmt.Println("Listener has err!")
+		global.LOG.Error("Listener has err!")
 		return
 	}
 	// 在结束时关闭Listener

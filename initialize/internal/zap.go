@@ -1,8 +1,6 @@
 package internal
 
 import (
-	"fmt"
-
 	"time"
 
 	"github.com/feel-easy/hole-server/global"
@@ -43,7 +41,7 @@ func (z *_zap) GetEncoderConfig() zapcore.EncoderConfig {
 func (z *_zap) GetEncoderCore(l zapcore.Level, level zap.LevelEnablerFunc) zapcore.Core {
 	writer, err := FileRotatelogs.GetWriteSyncer(l.String()) // 使用file-rotatelogs进行日志分割
 	if err != nil {
-		fmt.Printf("Get Write Syncer Failed err:%v", err.Error())
+		global.LOG.Sugar().Errorf("Get Write Syncer Failed err:%v", err.Error())
 		return nil
 	}
 

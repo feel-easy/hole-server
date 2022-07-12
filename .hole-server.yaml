@@ -1,0 +1,51 @@
+# zap logger configuration
+zap:
+  level: "info"
+  prefix: "[hole-server]"
+  format: "console"
+  director: "log"
+  encode-level: "LowercaseColorLevelEncoder"
+  stacktrace-key: "stacktrace"
+  max-age: 30 # 默认日志留存默认以天为单位
+  show-line: true
+  log-in-console: true
+
+# redis configuration
+redis:
+  db: 0
+  addr: "127.0.0.1:6379"
+  password: ""
+
+# email configuration
+email:
+  to: "xxx@qq.com"
+  port: 465
+  from: "xxx@163.com"
+  host: "smtp.163.com"
+  is-ssl: true
+  secret: "xxx"
+  nickname: "test"
+
+# system configuration
+system:
+  env: "public"
+  addr: 8888
+  db-type: "mysql"
+  use-redis: false # 使用redis
+  use-multipoint: false
+  # IP限制次数 一个小时15000次
+  iplimit-count: 15000
+  #  IP限制一个小时
+  iplimit-time: 3600
+
+mysql:
+  path: "localhost"
+  port: "3306"
+  config: "charset=utf8mb4&parseTime=True&loc=UTC&multiStatements=true"
+  db-name: "hole-server"
+  username: "root"
+  password: "root"
+  max-idle-conns: 10
+  max-open-conns: 100
+  log-mode: "info"
+  log-zap: false
