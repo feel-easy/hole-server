@@ -1,4 +1,4 @@
-package state
+package user
 
 import (
 	"bytes"
@@ -7,9 +7,9 @@ import (
 	"github.com/feel-easy/hole-server/models"
 )
 
-type home struct{}
+type Login struct{}
 
-func (*home) Next(user *models.User) (consts.StateID, error) {
+func (*Login) Next(user *models.User) (consts.StateID, error) {
 	buf := bytes.Buffer{}
 	buf.WriteString("1.Login\n")
 	buf.WriteString("2.Register\n")
@@ -30,6 +30,6 @@ func (*home) Next(user *models.User) (consts.StateID, error) {
 	return 0, user.WriteError(consts.ErrorsInputInvalid)
 }
 
-func (*home) Exit(user *models.User) consts.StateID {
+func (*Login) Exit(user *models.User) consts.StateID {
 	return 0
 }

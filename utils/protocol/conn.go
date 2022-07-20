@@ -7,19 +7,19 @@ import (
 var connId int64
 
 type Conn struct {
-	id    int64
+	id    int
 	state int
 	conn  ReadWriteCloser
 }
 
 func Wrapper(conn ReadWriteCloser) *Conn {
 	return &Conn{
-		id:   atomic.AddInt64(&connId, 1),
+		id:   int(atomic.AddInt64(&connId, 1)),
 		conn: conn,
 	}
 }
 
-func (c *Conn) ID() int64 {
+func (c *Conn) ID() int {
 	return c.id
 }
 

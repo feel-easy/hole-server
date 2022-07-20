@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/feel-easy/hole-server/consts"
+	"github.com/feel-easy/hole-server/mahjong/game"
 	"github.com/feel-easy/hole-server/utils"
 	"github.com/feel-easy/hole-server/utils/logs"
 	"github.com/feel-easy/hole-server/utils/protocol"
@@ -27,6 +28,13 @@ type User struct {
 	online bool
 }
 
+func (p *User) MahjongPlayer() game.Player {
+	return &MahjongPlayer{
+		ID:   p.ID,
+		Name: p.Name,
+	}
+}
+
 func (u *User) Write(bytes []byte) error {
 	return u.conn.Write(protocol.Packet{
 		Body: bytes,
@@ -42,7 +50,7 @@ func (u *User) Offline() {
 		room.Lock()
 		defer room.Unlock()
 		room.broadcast(fmt.Sprintf("%s lost connection! \n", u.Name))
-		if room.State == consts.RoomStateWaiting {
+		if room.State == consts.Waiting {
 			room.removeUser(u)
 		}
 		room.Cancel()
@@ -120,12 +128,13 @@ func (u *User) AskForInt(timeout ...time.Duration) (int, error) {
 	return packet.Int()
 }
 
-func (u *User) AskForInt64(timeout ...time.Duration) (int64, error) {
+func (u *User) AskForint(timeout ...time.Duration) (int, error) {
 	packet, err := u.AskForPacket(timeout...)
 	if err != nil {
 		return 0, err
 	}
-	return packet.Int64()
+	num, err := packet.Int64()
+	return int(num), err
 }
 
 func (u *User) AskForString(timeout ...time.Duration) (string, error) {

@@ -5,6 +5,9 @@ import (
 
 	"github.com/feel-easy/hole-server/consts"
 	"github.com/feel-easy/hole-server/models"
+	"github.com/feel-easy/hole-server/state/game"
+	"github.com/feel-easy/hole-server/state/menu"
+	"github.com/feel-easy/hole-server/state/user"
 	"github.com/feel-easy/hole-server/utils"
 	"github.com/feel-easy/hole-server/utils/logs"
 )
@@ -13,7 +16,13 @@ var states = map[consts.StateID]State{}
 
 func init() {
 	register(consts.StateWelcome, &welcome{})
-	register(consts.StateHome, &home{})
+	register(consts.StateJoin, &join{})
+	register(consts.StateCreate, &create{})
+	register(consts.StateWaiting, &waiting{})
+	register(consts.StateHome, &menu.Home{})
+	register(consts.StateLogin, &user.Login{})
+	register(consts.StateRegister, &user.Register{})
+	register(consts.StateMahjong, &game.Mahjong{})
 }
 
 func register(id consts.StateID, state State) {
@@ -53,12 +62,12 @@ func Run(user *models.User) {
 	}
 }
 
-func isExit(signal string) bool {
+func IsExit(signal string) bool {
 	signal = strings.ToLower(signal)
 	return isX(signal, "exit", "e")
 }
 
-func isLs(signal string) bool {
+func IsLs(signal string) bool {
 	return isX(signal, "ls")
 }
 

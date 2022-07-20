@@ -1,5 +1,7 @@
 package consts
 
+import "time"
+
 type StateID int
 
 const (
@@ -17,6 +19,21 @@ const (
 	StateMahjong
 )
 
+type GameType int
+
+const (
+	_ GameType = iota
+	Mahjong
+)
+
+type RoomState int
+
+const (
+	_ RoomState = iota
+	Waiting
+	Running
+)
+
 const (
 	IsStart = "INTERACTIVE_SIGNAL_START"
 	IsStop  = "INTERACTIVE_SIGNAL_STOP"
@@ -24,8 +41,8 @@ const (
 	MinPlayers = 2
 	MaxPlayers = 3
 
-	RoomStateWaiting = 1
-	RoomStateRunning = 2
+	PlayTimeout        = 40 * time.Second
+	PlayMahjongTimeout = 30 * time.Second
 )
 
 type Error struct {
@@ -60,10 +77,12 @@ var (
 	ErrorsMustHaveToPlay         = NewErr(1, false, "There is a hand that can be played and must be played. ")
 	ErrorsEndToPlay              = NewErr(1, false, "Can only come out at the end. ")
 
-	GameTypes    = map[int]string{}
-	GameTypesIds = []int{}
-	RoomStates   = map[int]string{
-		RoomStateWaiting: "Waiting",
-		RoomStateRunning: "Running",
+	GameTypes = map[GameType]string{
+		Mahjong: "Mahjong",
+	}
+	GameTypesIds = []GameType{Mahjong}
+	RoomStates   = map[RoomState]string{
+		Waiting: "Waiting",
+		Running: "Running",
 	}
 )
