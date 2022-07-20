@@ -166,6 +166,7 @@ func (u *User) Conn(conn *protocol.Conn) {
 	u.conn = conn
 	u.data = make(chan *protocol.Packet, 8)
 	u.online = true
+	setUser(u)
 }
 
 func (u *User) String() string {

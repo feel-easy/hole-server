@@ -13,3 +13,7 @@ func delRoom(roomID int) {
 func getUser(userID int) *User {
 	return users[userID]
 }
+
+func setUser(user *User) {
+	users[user.ID] = user
+}
