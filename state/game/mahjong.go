@@ -56,11 +56,11 @@ func (g *Mahjong) Next(user *models.User) (consts.StateID, error) {
 func (g *Mahjong) Exit(user *models.User) consts.StateID {
 	room := models.GetRoom(user.RoomID)
 	if room == nil {
-		return consts.StateMahjong
+		return consts.StateHome
 	}
 	game := room.RoomGame.(*models.Mahjong)
 	if game == nil {
-		return consts.StateMahjong
+		return consts.StateHome
 	}
 	for _, userId := range game.PlayerIDs {
 		game.States[userId] <- stateWaiting
@@ -71,7 +71,7 @@ func (g *Mahjong) Exit(user *models.User) consts.StateID {
 	room.RoomGame = nil
 	room.State = consts.Waiting
 	room.Unlock()
-	return consts.StateMahjong
+	return consts.StateHome
 }
 
 func handleTake(room *models.Room, user *models.User, game *models.Mahjong) error {
@@ -222,7 +222,7 @@ func InitMahjongGame(room *models.Room) (*models.Mahjong, error) {
 		user := models.GetUser(userId)
 		mjPlayers = append(mjPlayers, models.NewPlayer(user))
 		playerIDs = append(playerIDs, user.ID)
-		states[userId] = make(chan int, 1)
+		states[userId] = make(chan int, 2)
 	}
 	rand.Seed(time.Now().UnixNano())
 	mahjong := game.New(mjPlayers)

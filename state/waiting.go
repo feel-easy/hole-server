@@ -62,28 +62,21 @@ func waitingForStart(user *models.User, room *models.Room) (consts.StateID, bool
 			return consts.StateWaiting, access, err
 		}
 		if room.State == consts.Running {
-			if room.Type == 4 {
-				_type = consts.StateRunFastGame
-			}
 			access = true
 			break
 		}
 		signal = strings.ToLower(signal)
-		if signal == "ls" || signal == "v" {
+		switch signal {
+		case "ls", "v":
 			viewRoomUsers(room, user)
-		} else if (signal == "start" || signal == "s") && room.Creator == user.ID && room.UserNumber() > 1 {
-			//跑得快限制必须三人
-			if room.Type == 4 && room.UserNumber() != 3 {
-				err := user.WriteError(consts.ErrorsGamePlayersInvalid)
-				if err != nil {
-					return consts.StateWaiting, false, err
-				}
+			break
+		case "start", "s":
+			if room.Creator != user.ID || room.UserNumber() <= 1 {
 				continue
 			}
 			access = true
 			room.Lock()
 			switch room.Type {
-			default:
 			case consts.Mahjong:
 				room.RoomGame, err = game.InitMahjongGame(room)
 			case consts.Uno:
@@ -96,13 +89,15 @@ func waitingForStart(user *models.User, room *models.Room) (consts.StateID, bool
 			}
 			room.State = consts.Running
 			room.Unlock()
-
 			break
-		} else if strings.HasPrefix(signal, "set ") && room.Creator == user.ID {
-
-			user.BroadcastChat(fmt.Sprintf("%s say: %s\n", user.Name, signal))
-		} else if len(signal) > 0 {
-			user.BroadcastChat(fmt.Sprintf("%s say: %s\n", user.Name, signal))
+		default:
+			if strings.HasPrefix(signal, "set ") && room.Creator == user.ID {
+				user.BroadcastChat(fmt.Sprintf("%s say: %s\n", user.Name, signal))
+				break
+			}
+			if len(signal) > 0 {
+				user.BroadcastChat(fmt.Sprintf("%s say: %s\n", user.Name, signal))
+			}
 		}
 	}
 	return _type, access, nil

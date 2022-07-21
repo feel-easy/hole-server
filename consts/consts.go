@@ -14,7 +14,6 @@ const (
 	StateCreate
 	StateWaiting
 	StateGame
-	StateRunFastGame
 	StateUnoGame
 	StateMahjong
 )

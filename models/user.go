@@ -72,7 +72,6 @@ func (u *User) Listening() error {
 
 // 向客户端发生消息
 func (u *User) WriteString(data string) error {
-	time.Sleep(30 * time.Millisecond)
 	return u.conn.Write(protocol.Packet{
 		Body: []byte(data),
 	})

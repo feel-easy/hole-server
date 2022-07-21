@@ -60,10 +60,10 @@ func (g *Uno) Next(user *models.User) (consts.StateID, error) {
 func (g *Uno) Exit(user *models.User) consts.StateID {
 	room := models.GetRoom(user.RoomID)
 	if room == nil {
-		return consts.StateUnoGame
+		return consts.StateHome
 	}
 	models.LeaveRoom(room.ID, user.ID)
-	return consts.StateUnoGame
+	return consts.StateHome
 }
 
 func handlePlayUno(room *models.Room, user *models.User, game *models.UnoGame) error {
