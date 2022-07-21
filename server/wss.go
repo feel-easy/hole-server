@@ -8,6 +8,13 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+var clients = make(map[*websocket.Conn]bool)
+var broadcast = make(chan Message)
+
+type Message struct {
+	Message string `json:"message"`
+}
+
 type Websocket struct {
 	addr string
 }
@@ -25,6 +32,8 @@ func NewWebsocketServer(addr string) Websocket {
 }
 
 func (w Websocket) Serve() error {
+	fs := http.FileServer(http.Dir("public"))
+	http.Handle("/", fs)
 	http.HandleFunc("/ws", serveWs)
 	logs.Infof("Websocket server listener on %s\n", w.addr)
 	return http.ListenAndServe(w.addr, nil)
