@@ -24,6 +24,7 @@ type GameType int
 const (
 	_ GameType = iota
 	Mahjong
+	Uno
 )
 
 type RoomState int
@@ -79,8 +80,9 @@ var (
 
 	GameTypes = map[GameType]string{
 		Mahjong: "Mahjong",
+		Uno:     "uno",
 	}
-	GameTypesIds = []GameType{Mahjong}
+	GameTypesIds = []GameType{Mahjong, Uno}
 	RoomStates   = map[RoomState]string{
 		Waiting: "Waiting",
 		Running: "Running",

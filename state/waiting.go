@@ -27,6 +27,8 @@ func (s *waiting) Next(user *models.User) (consts.StateID, error) {
 		switch room.Type {
 		case consts.Mahjong:
 			return consts.StateMahjong, nil
+		case consts.Uno:
+			return consts.StateUnoGame, nil
 		default:
 			return _type, nil
 		}
@@ -84,6 +86,8 @@ func waitingForStart(user *models.User, room *models.Room) (consts.StateID, bool
 			default:
 			case consts.Mahjong:
 				room.RoomGame, err = game.InitMahjongGame(room)
+			case consts.Uno:
+				room.RoomGame, err = game.InitUnoGame(room)
 			}
 			if err != nil {
 				room.Unlock()
