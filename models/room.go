@@ -13,7 +13,7 @@ type Room struct {
 
 	ID         int              `json:"id"`
 	Type       consts.GameType  `json:"type"`
-	Game       Game             `json:"roomGame"`
+	RoomGame   RoomGame         `json:"roomGame"`
 	State      consts.RoomState `json:"state"`
 	Users      map[int]*User    `json:"users"`
 	Robots     int              `json:"robots"`
@@ -84,8 +84,8 @@ func (room *Room) broadcast(msg string, exclude ...int) {
 
 func (room *Room) delete() {
 	if room != nil {
-		if room.Game != nil {
-			room.Game.delete()
+		if room.RoomGame != nil {
+			room.RoomGame.delete()
 		}
 		delRoom(room.ID)
 	}

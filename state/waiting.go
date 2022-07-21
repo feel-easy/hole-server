@@ -83,7 +83,7 @@ func waitingForStart(user *models.User, room *models.Room) (consts.StateID, bool
 			switch room.Type {
 			default:
 			case consts.Mahjong:
-				room.Game, err = game.InitMahjongGame(room)
+				room.RoomGame, err = game.InitMahjongGame(room)
 			}
 			if err != nil {
 				room.Unlock()

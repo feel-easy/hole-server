@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/feel-easy/hole-server/consts"
-	"github.com/feel-easy/hole-server/mahjong/game"
 	"github.com/feel-easy/hole-server/utils"
 	"github.com/feel-easy/hole-server/utils/logs"
 	"github.com/feel-easy/hole-server/utils/protocol"
@@ -28,11 +27,12 @@ type User struct {
 	online bool
 }
 
-func (p *User) MahjongPlayer() game.Player {
-	return &MahjongPlayer{
-		ID:   p.ID,
-		Name: p.Name,
-	}
+func (u *User) UserID() int {
+	return u.ID
+}
+
+func (u *User) UserName() string {
+	return u.Name
 }
 
 func (u *User) Write(bytes []byte) error {

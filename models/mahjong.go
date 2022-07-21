@@ -7,18 +7,33 @@ import (
 	"strings"
 
 	rconsts "github.com/feel-easy/hole-server/consts"
-	"github.com/feel-easy/hole-server/mahjong/card"
-	"github.com/feel-easy/hole-server/mahjong/consts"
-	"github.com/feel-easy/hole-server/mahjong/event"
-	"github.com/feel-easy/hole-server/mahjong/game"
-	"github.com/feel-easy/hole-server/mahjong/tile"
+	"github.com/feel-easy/mahjong/card"
+	"github.com/feel-easy/mahjong/consts"
+	"github.com/feel-easy/mahjong/event"
+	"github.com/feel-easy/mahjong/game"
+	"github.com/feel-easy/mahjong/tile"
 )
 
+const initialRune = 'A'
+
+type runeSequence struct {
+	currentRune rune
+}
+
+func (s *runeSequence) next() rune {
+	if s.currentRune == 0 {
+		s.currentRune = initialRune
+	}
+	currentRune := s.currentRune
+	s.currentRune++
+	return currentRune
+}
+
 type Mahjong struct {
-	Room    *Room            `json:"room"`
-	Players []int            `json:"players"`
-	States  map[int]chan int `json:"states"`
-	Game    *game.Game       `json:"game"`
+	Room      *Room            `json:"room"`
+	PlayerIDs []int            `json:"playerIds"`
+	States    map[int]chan int `json:"states"`
+	Game      *game.Game       `json:"game"`
 }
 
 func (game *Mahjong) delete() {
@@ -29,14 +44,20 @@ func (game *Mahjong) delete() {
 	}
 }
 
+type OP struct {
+	operation int
+	tiles     []int
+}
 type MahjongPlayer struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 
-type OP struct {
-	operation int
-	tiles     []int
+func NewPlayer(user *User) *MahjongPlayer {
+	return &MahjongPlayer{
+		ID:   user.ID,
+		Name: user.Name,
+	}
 }
 
 func (p *MahjongPlayer) PlayerID() int {

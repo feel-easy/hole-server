@@ -8,14 +8,14 @@ import (
 	"time"
 
 	"github.com/feel-easy/hole-server/consts"
-	"github.com/feel-easy/hole-server/mahjong/card"
-	mjconsts "github.com/feel-easy/hole-server/mahjong/consts"
-	"github.com/feel-easy/hole-server/mahjong/event"
-	"github.com/feel-easy/hole-server/mahjong/game"
-	"github.com/feel-easy/hole-server/mahjong/tile"
-	"github.com/feel-easy/hole-server/mahjong/util"
-	cwin "github.com/feel-easy/hole-server/mahjong/win"
 	"github.com/feel-easy/hole-server/models"
+	"github.com/feel-easy/mahjong/card"
+	mjconsts "github.com/feel-easy/mahjong/consts"
+	"github.com/feel-easy/mahjong/event"
+	"github.com/feel-easy/mahjong/game"
+	"github.com/feel-easy/mahjong/tile"
+	"github.com/feel-easy/mahjong/util"
+	"github.com/feel-easy/mahjong/win"
 )
 
 type Mahjong struct{}
@@ -25,7 +25,7 @@ func (g *Mahjong) Next(user *models.User) (consts.StateID, error) {
 	if room == nil {
 		return 0, user.WriteError(consts.ErrorsExist)
 	}
-	game := room.Game.(*models.Mahjong)
+	game := room.RoomGame.(*models.Mahjong)
 	buf := bytes.Buffer{}
 	buf.WriteString("WELCOME TO MAHJONG GAME!!! \n")
 	buf.WriteString(fmt.Sprintf("%s is Banker! \n", models.GetUser(room.Banker).Name))
@@ -58,17 +58,17 @@ func (g *Mahjong) Exit(user *models.User) consts.StateID {
 	if room == nil {
 		return consts.StateMahjong
 	}
-	game := room.Game.(*models.Mahjong)
+	game := room.RoomGame.(*models.Mahjong)
 	if game == nil {
 		return consts.StateMahjong
 	}
-	for _, userId := range game.Players {
+	for _, userId := range game.PlayerIDs {
 		game.States[userId] <- stateWaiting
 	}
 	models.Broadcast(user.RoomID, fmt.Sprintf("user %s exit, game over! \n", user.Name))
 	models.LeaveRoom(user.RoomID, user.ID)
 	room.Lock()
-	room.Game = nil
+	room.RoomGame = nil
 	room.State = consts.Waiting
 	room.Unlock()
 	return consts.StateMahjong
@@ -83,10 +83,10 @@ func handleTake(room *models.Room, user *models.User, game *models.Mahjong) erro
 	if game.Game.Deck().NoTiles() {
 		models.Broadcast(room.ID, "Game over but no winners!!! \n")
 		room.Lock()
-		room.Game = nil
+		room.RoomGame = nil
 		room.State = consts.Waiting
 		room.Unlock()
-		for _, userId := range game.Players {
+		for _, userId := range game.PlayerIDs {
 			game.States[userId] <- stateWaiting
 		}
 		return nil
@@ -135,16 +135,16 @@ func handlePlayMahjong(room *models.Room, user *models.User, game *models.Mahjon
 		return nil
 	}
 	gameState := game.Game.ExtractState(p)
-	if cwin.CanWin(p.Hand(), p.GetShowCardTiles()) {
+	if win.CanWin(p.Hand(), p.GetShowCardTiles()) {
 		tiles := p.Tiles()
 		sort.Ints(tiles)
 		models.Broadcast(room.ID, fmt.Sprintf("%s wins! \n%s \n", p.Name(), tile.ToTileString(tiles)))
 		room.Lock()
-		room.Game = nil
+		room.RoomGame = nil
 		room.Banker = p.ID()
 		room.State = consts.Waiting
 		room.Unlock()
-		for _, userId := range game.Players {
+		for _, userId := range game.PlayerIDs {
 			game.States[userId] <- stateWaiting
 		}
 		return nil
@@ -177,11 +177,11 @@ func handlePlayMahjong(room *models.Room, user *models.User, game *models.Mahjon
 			models.Broadcast(room.ID, fmt.Sprintf("%s wins! \n%s \n", p.Name(), tile.ToTileString(tiles)))
 		}
 		room.Lock()
-		room.Game = nil
+		room.RoomGame = nil
 		room.Banker = gameState.CanWin[rand.Intn(len(gameState.CanWin))].ID()
 		room.State = consts.Waiting
 		room.Unlock()
-		for _, userId := range game.Players {
+		for _, userId := range game.PlayerIDs {
 			game.States[userId] <- stateWaiting
 		}
 		return nil
@@ -215,20 +215,20 @@ func handlePlayMahjong(room *models.Room, user *models.User, game *models.Mahjon
 
 func InitMahjongGame(room *models.Room) (*models.Mahjong, error) {
 	roomUsers := room.Users
-	players := make([]int, 0, len(roomUsers))
-	mjUsers := make([]game.Player, 0, len(roomUsers))
+	playerIDs := make([]int, 0, len(roomUsers))
+	mjPlayers := make([]game.Player, 0, len(roomUsers))
 	states := map[int]chan int{}
 	for userId := range roomUsers {
-		p := *models.GetUser(userId)
-		players = append(players, p.ID)
-		mjUsers = append(mjUsers, p.MahjongPlayer())
+		user := models.GetUser(userId)
+		mjPlayers = append(mjPlayers, models.NewPlayer(user))
+		playerIDs = append(playerIDs, user.ID)
 		states[userId] = make(chan int, 1)
 	}
 	rand.Seed(time.Now().UnixNano())
-	mahjong := game.New(mjUsers)
+	mahjong := game.New(mjPlayers)
 	mahjong.DealStartingTiles()
-	if room.Banker == 0 || !util.IntInSlice(room.Banker, players) {
-		room.Banker = players[rand.Intn(len(players))]
+	if room.Banker == 0 || !util.IntInSlice(room.Banker, playerIDs) {
+		room.Banker = playerIDs[rand.Intn(len(playerIDs))]
 	}
 	for {
 		if mahjong.Current().ID() == room.Banker {
@@ -238,9 +238,9 @@ func InitMahjongGame(room *models.Room) (*models.Mahjong, error) {
 	}
 	states[mahjong.Current().ID()] <- stateTakeCard
 	return &models.Mahjong{
-		Room:    room,
-		Players: players,
-		States:  states,
-		Game:    mahjong,
+		Room:      room,
+		PlayerIDs: playerIDs,
+		States:    states,
+		Game:      mahjong,
 	}, nil
 }

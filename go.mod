@@ -3,6 +3,7 @@ module github.com/feel-easy/hole-server
 go 1.18
 
 require (
+	github.com/feel-easy/mahjong v0.0.0-20220721030133-7a0f4032c008
 	github.com/gorilla/websocket v1.5.0
 	github.com/json-iterator/go v1.1.12
 )
