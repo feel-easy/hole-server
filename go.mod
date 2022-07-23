@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/feel-easy/mahjong v0.0.0-20220721030133-7a0f4032c008
-	github.com/feel-easy/uno v0.0.0-20220721061415-e6a3189cfd70
+	github.com/feel-easy/uno v0.0.0-20220721064355-530dd0134345
 	github.com/gorilla/websocket v1.5.0
 	github.com/json-iterator/go v1.1.12
 )
