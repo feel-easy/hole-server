@@ -71,7 +71,17 @@ func waitingForStart(user *models.User, room *models.Room) (consts.StateID, bool
 			viewRoomUsers(room, user)
 			break
 		case "start", "s":
-			if room.Creator != user.ID || room.UserNumber() <= 1 {
+			if room.Creator != user.ID {
+				if len(signal) > 0 {
+					user.BroadcastChat(fmt.Sprintf("%s say: %s\n", user.Name, signal))
+				}
+				continue
+			}
+			if room.UserNumber() <= 1 {
+				err := user.WriteError(consts.ErrorsGamePlayersInvalid)
+				if err != nil {
+					return consts.StateWaiting, false, err
+				}
 				continue
 			}
 			access = true

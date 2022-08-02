@@ -15,15 +15,22 @@ import (
 var (
 	wsPort  string
 	tcpPort string
+	webPort string
 )
 
 func init() {
-	flag.StringVar(&wsPort, "w", "9998", "WebsocketServer Port")
-	flag.StringVar(&tcpPort, "t", "9999", "TcpServer Port")
+	flag.StringVar(&webPort, "web", "9996", "TcpServer Port")
+	flag.StringVar(&wsPort, "ws", "9998", "WebsocketServer Port")
+	flag.StringVar(&tcpPort, "tcp", "9999", "TcpServer Port")
 }
 
 func main() {
 	flag.Parse()
+	utils.Async(func() {
+		webServer := server.NewWebServer(":" + webPort)
+		log.Panic(webServer.Serve())
+	})
+
 	utils.Async(func() {
 		wsServer := server.NewWebsocketServer(":" + wsPort)
 		log.Panic(wsServer.Serve())

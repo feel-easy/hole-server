@@ -32,8 +32,6 @@ func NewWebsocketServer(addr string) Websocket {
 }
 
 func (w Websocket) Serve() error {
-	fs := http.FileServer(http.Dir("public"))
-	http.Handle("/", fs)
 	http.HandleFunc("/ws", serveWs)
 	logs.Infof("Websocket server listener on %s\n", w.addr)
 	return http.ListenAndServe(w.addr, nil)
