@@ -4,15 +4,20 @@
 <head>
   <meta charset="UTF-8" />
   <title>hole</title>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
   <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
   <script src="./js/initWebSocket.js"></script>
   <script>
     let isInit = false 
     function sendMsg(){
+      let msg = $("#send-input").val().trim()
+      if (msg === ""){
+        return
+      }
       console.log($("#msg-list").text())
       $("#msg-list").html("")
       if(!$("#send-input").attr("disabled")){
-        sendWsMsg($("#send-input").val())
+        sendWsMsg(msg)
       }
     }
     $(document).keyup(function(event){  
