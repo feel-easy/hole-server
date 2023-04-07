@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - master
-env:
-  AWS_REGION: $AWS_REGION
-  ECR_REPOSITORY: $ECR_REPOSITORY
-  AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID
 
 jobs:
   build-and-push:
