@@ -38,3 +38,13 @@ jobs:
       - name: Log out of Amazon ECR
         if: always()
         run: docker logout ${{ steps.login-ecr.outputs.registry }}
+  provisioning:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: kciter/terraform-apply-for-aws-action@v3
+      with:
+        access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        region: ${{ secrets.AWS_REGION }}
+        variables: var=${{ github.sha }}
+        path: terraform/dev
