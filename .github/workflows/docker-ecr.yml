@@ -1,9 +1,17 @@
 name: Docker to ECR
 
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+      tags:
+        description: 'workflow_dispatch'
+  # push:
+  #   branches:
+  #     - master
 env:
   AWS_REGION: ${{secrets.AWS_ACCOUNT_ID}}
   ECR_REPOSITORY: ${{secrets.ECR_REPOSITORY}}
