@@ -6,6 +6,7 @@ package main
 
 import (
 	"flag"
+	"log"
 
 	"github.com/feel-easy/hole-server/utils"
 )
@@ -22,5 +23,5 @@ func main() {
 	flag.Parse()
 	utils.Async(func() {
 	})
-
+	log.Println("hello")
 }
